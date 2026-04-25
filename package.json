@@ -2,10 +2,19 @@
   "name": "@aefree/pi-themes",
   "private": true,
   "version": "0.1.0",
-  "description": "Pi theme package with a Solarized Dark theme.",
   "license": "MIT",
   "type": "module",
-  "keywords": ["pi-package", "pi-theme", "solarized"],
+  "keywords": [
+    "pi-package",
+    "pi-theme",
+    "solarized"
+  ],
+  "pi": {
+    "themes": [
+      "./themes"
+    ]
+  },
+  "description": "Pi theme package with a Solarized Dark theme.",
   "repository": {
     "type": "git",
     "url": "git+ssh://git@github.com/aefreedman/pi-themes.git"
@@ -13,10 +22,5 @@
   "bugs": {
     "url": "https://github.com/aefreedman/pi-themes/issues"
   },
-  "homepage": "https://github.com/aefreedman/pi-themes#readme",
-  "pi": {
-    "themes": [
-      "./themes"
-    ]
-  }
+  "homepage": "https://github.com/aefreedman/pi-themes#readme"
 }
