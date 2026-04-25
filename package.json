@@ -3,6 +3,7 @@
   "private": true,
   "version": "0.1.0",
   "description": "Pi theme package with a Solarized Dark theme.",
+  "license": "MIT",
   "type": "module",
   "keywords": ["pi-package", "pi-theme", "solarized"],
   "repository": {

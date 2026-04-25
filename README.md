@@ -29,3 +29,11 @@ pi install -l "<path-to-pi-themes>"
   "theme": "solarized-dark"
 }
 ```
+
+## Attribution
+
+The `solarized-dark` theme adapts the Solarized color palette created by Ethan Schoonover. See `NOTICE.md`.
+
+## License
+
+MIT. See `LICENSE`.
