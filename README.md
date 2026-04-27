@@ -1,28 +1,34 @@
 # Pi Themes
 
-Personal Pi theme package for cross-project, machine-global installs.
+Reusable Pi theme package.
 
-Current contents:
-- `solarized-dark`
+## Contents
+
+- `solarized-dark` - a Pi theme based on the Solarized color palette
 
 ## Install
+
+From GitHub:
+
+```bash
+pi install git:git@github.com:aefreedman/pi-themes.git
+```
 
 Local development install:
 
 ```bash
-pi install "<path-to-pi-themes>"
+pi install <path-to-pi-themes>
 ```
 
 Project-local install:
 
 ```bash
-pi install -l "<path-to-pi-themes>"
+pi install -l <path-to-pi-themes>
 ```
 
-## Notes
+## Usage
 
-- Pi discovers packaged themes from `themes/`.
-- After install, select the theme by name:
+Pi discovers packaged themes from `themes/`. After installation, select the theme by name in Pi settings:
 
 ```json
 {
