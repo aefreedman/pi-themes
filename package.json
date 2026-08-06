@@ -1,6 +1,5 @@
 {
   "name": "@aefree/pi-themes",
-  "private": true,
   "version": "0.1.0",
   "license": "MIT",
   "type": "module",
@@ -9,6 +8,13 @@
     "pi-theme",
     "solarized"
   ],
+  "files": [
+    "themes",
+    "NOTICE.md"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
   "pi": {
     "themes": [
       "./themes"

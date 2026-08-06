@@ -8,6 +8,12 @@ Reusable Pi theme package.
 
 ## Install
 
+From npm:
+
+```bash
+pi install npm:@aefree/pi-themes
+```
+
 From GitHub:
 
 ```bash
