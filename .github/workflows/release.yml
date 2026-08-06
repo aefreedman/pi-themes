@@ -35,4 +35,5 @@ jobs:
           };
           if (!atLeast(process.version, '22.14.0') || !atLeast(process.argv[2], '11.5.1')) process.exit(1);
           NODE
+      - run: npm test
       - run: npm publish

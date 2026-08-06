@@ -20,6 +20,9 @@
       "./themes"
     ]
   },
+  "scripts": {
+    "test": "node --test tests/*.test.mjs"
+  },
   "description": "Pi theme package with a Solarized Dark theme.",
   "repository": {
     "type": "git",
