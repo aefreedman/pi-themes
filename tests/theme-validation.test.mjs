@@ -17,20 +17,22 @@ function isColorValue(value, variables) {
     || (typeof value === "string" && (/^#[0-9a-f]{6}$/i.test(value) || Object.hasOwn(variables, value)));
 }
 
-test("Solarized Dark satisfies Pi's theme contract", async () => {
-  const theme = JSON.parse(await readFile(new URL("../themes/solarized-dark.json", import.meta.url), "utf8"));
-  assert.equal(theme.$schema, "https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/src/modes/interactive/theme/theme-schema.json");
-  assert.equal(typeof theme.name, "string");
-  assert.ok(theme.name.length > 0 && !theme.name.includes("/"));
+for (const themeName of ["solarized-dark", "solarized-light"]) {
+  test(`${themeName} satisfies Pi's theme contract`, async () => {
+    const theme = JSON.parse(await readFile(new URL(`../themes/${themeName}.json`, import.meta.url), "utf8"));
+    assert.equal(theme.$schema, "https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/src/modes/interactive/theme/theme-schema.json");
+    assert.equal(theme.name, themeName);
+    assert.ok(theme.name.length > 0 && !theme.name.includes("/"));
 
-  const variables = theme.vars ?? {};
-  for (const [name, value] of Object.entries(variables)) {
-    assert.ok(isColorValue(value, {}), `invalid variable ${name}: ${String(value)}`);
-  }
-  for (const name of requiredColors) {
-    assert.ok(Object.hasOwn(theme.colors, name), `missing required color ${name}`);
-  }
-  for (const [name, value] of Object.entries(theme.colors)) {
-    assert.ok(isColorValue(value, variables), `invalid color ${name}: ${String(value)}`);
-  }
-});
+    const variables = theme.vars ?? {};
+    for (const [name, value] of Object.entries(variables)) {
+      assert.ok(isColorValue(value, {}), `invalid variable ${name}: ${String(value)}`);
+    }
+    for (const name of requiredColors) {
+      assert.ok(Object.hasOwn(theme.colors, name), `missing required color ${name}`);
+    }
+    for (const [name, value] of Object.entries(theme.colors)) {
+      assert.ok(isColorValue(value, variables), `invalid color ${name}: ${String(value)}`);
+    }
+  });
+}

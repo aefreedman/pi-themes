@@ -4,7 +4,8 @@ Reusable Pi theme package.
 
 ## Contents
 
-- `solarized-dark` - a Pi theme based on the Solarized color palette
+- `solarized-dark` - Solarized for dark terminal backgrounds
+- `solarized-light` - Solarized for light terminal backgrounds
 
 ## Install
 
@@ -42,9 +43,15 @@ Pi discovers packaged themes from `themes/`. After installation, select the them
 }
 ```
 
+To follow the terminal's detected appearance, start Pi with the paired themes:
+
+```bash
+pi --use-theme solarized-light/solarized-dark
+```
+
 ## Attribution
 
-The `solarized-dark` theme adapts the Solarized color palette created by Ethan Schoonover. See `NOTICE.md`.
+The `solarized-dark` and `solarized-light` themes adapt the Solarized color palette created by Ethan Schoonover. See `NOTICE.md`.
 
 ## License
 

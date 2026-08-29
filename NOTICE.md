@@ -2,7 +2,7 @@
 
 ## Solarized Color Palette
 
-The `solarized-dark` theme adapts the Solarized color palette for Pi theme configuration.
+The `solarized-dark` and `solarized-light` themes adapt the Solarized color palette for Pi theme configuration.
 
 Solarized was created by Ethan Schoonover.
 

@@ -1,6 +1,6 @@
 {
   "name": "@aefree/pi-themes",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "license": "MIT",
   "type": "module",
   "keywords": [
@@ -23,7 +23,7 @@
   "scripts": {
     "test": "node --test tests/*.test.mjs"
   },
-  "description": "Pi theme package with a Solarized Dark theme.",
+  "description": "Solarized Dark and Light themes for Pi.",
   "repository": {
     "type": "git",
     "url": "git+ssh://git@github.com/aefreedman/pi-themes.git"
