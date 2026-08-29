@@ -8,6 +8,8 @@
     "base00": "#657b83",
     "base0": "#839496",
     "base1": "#93a1a1",
+    "base2": "#eee8d5",
+    "base3": "#fdf6e3",
     "yellow": "#b58900",
     "orange": "#cb4b16",
     "red": "#dc322f",
@@ -37,6 +39,9 @@
     "thinkingText": "base00",
 
     "selectedBg": "base02",
+    "scrollbarThumb": "base01",
+    "searchMatchBg": "yellow",
+    "searchMatchText": "base03",
     "userMessageBg": "cardBg",
     "userMessageText": "base0",
     "customMessageBg": "customBg",
@@ -63,7 +68,7 @@
     "toolDiffRemoved": "red",
     "toolDiffContext": "base00",
 
-    "syntaxComment": "base01",
+    "syntaxComment": "base00",
     "syntaxKeyword": "green",
     "syntaxFunction": "orange",
     "syntaxVariable": "blue",
@@ -73,12 +78,13 @@
     "syntaxOperator": "base0",
     "syntaxPunctuation": "base00",
 
-    "thinkingOff": "yellow",
+    "thinkingOff": "base01",
     "thinkingMinimal": "base00",
     "thinkingLow": "blue",
     "thinkingMedium": "cyan",
     "thinkingHigh": "violet",
     "thinkingXhigh": "magenta",
+    "thinkingMax": "red",
 
     "bashMode": "green"
   },

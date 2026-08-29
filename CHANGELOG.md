@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.2.1 - 2026-08-29
+
+### Changed
+
+- Improved text, comment, selection, and thinking-level contrast in both Solarized themes.
+- Added explicit scrollbar, search highlight, and maximum-thinking colors.
+
 ## 0.2.0 - 2026-08-29
 
 ### Added
