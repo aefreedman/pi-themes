@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Declare explicit dark/light appearance for the Solarized themes, preserving both palettes.
+
 ## 0.2.1 - 2026-08-29
 
 ### Changed

@@ -17,12 +17,14 @@ function isColorValue(value, variables) {
     || (typeof value === "string" && (/^#[0-9a-f]{6}$/i.test(value) || Object.hasOwn(variables, value)));
 }
 
-for (const themeName of ["solarized-dark", "solarized-light"]) {
+for (const [themeName, appearance] of [["solarized-dark", "dark"], ["solarized-light", "light"]]) {
   test(`${themeName} satisfies Pi's theme contract`, async () => {
     const theme = JSON.parse(await readFile(new URL(`../themes/${themeName}.json`, import.meta.url), "utf8"));
     assert.equal(theme.$schema, "https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/src/modes/interactive/theme/theme-schema.json");
     assert.equal(theme.name, themeName);
     assert.ok(theme.name.length > 0 && !theme.name.includes("/"));
+    assert.notEqual(theme.name, "system");
+    assert.equal(theme.appearance, appearance);
 
     const variables = theme.vars ?? {};
     for (const [name, value] of Object.entries(variables)) {
