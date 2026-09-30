@@ -2,16 +2,29 @@ name: Publish to npm
 
 on:
   workflow_dispatch:
+    inputs:
+      tag:
+        description: Immutable release tag (v<package version>)
+        required: true
+        type: string
 
 permissions:
   contents: read
   id-token: write
 
+concurrency:
+  group: npm-release
+  cancel-in-progress: false
+
 jobs:
   publish:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag }}
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: 24
@@ -35,5 +48,67 @@ jobs:
           };
           if (!atLeast(process.version, '22.14.0') || !atLeast(process.argv[2], '11.5.1')) process.exit(1);
           NODE
-      - run: npm test
-      - run: npm publish
+      - name: Bind immutable release identity
+        id: identity
+        env:
+          RELEASE_TAG: ${{ inputs.tag }}
+        run: |
+          set -euo pipefail
+          version="$(node -p 'JSON.parse(require("fs").readFileSync("package.json", "utf8")).version')"
+          name="$(node -p 'JSON.parse(require("fs").readFileSync("package.json", "utf8")).name')"
+          [[ "$RELEASE_TAG" == "v$version" && "$RELEASE_TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]
+          commit="$(git rev-parse HEAD)"
+          [[ "$(git rev-parse "refs/tags/$RELEASE_TAG^{commit}")" == "$commit" ]]
+          remote="$(git ls-remote --exit-code origin "refs/tags/$RELEASE_TAG" "refs/tags/$RELEASE_TAG^{}")"
+          remote_commit="$(printf '%s\n' "$remote" | awk '/\^\{\}$/ {print $1}')"
+          if [[ -z "$remote_commit" ]]; then
+            remote_commit="$(printf '%s\n' "$remote" | awk '{print $1}')"
+          fi
+          [[ "$remote_commit" == "$commit" ]]
+          VERSION="$version" node --input-type=module <<'NODE'
+          import { readFileSync } from 'node:fs';
+          const changelog = readFileSync('CHANGELOG.md', 'utf8');
+          if (!changelog.split('\n').some(line => line.startsWith(`## ${process.env.VERSION} - `))) {
+            throw new Error('Finalized version missing from changelog');
+          }
+          NODE
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "name=$name" >> "$GITHUB_OUTPUT"
+          echo "commit=$commit" >> "$GITHUB_OUTPUT"
+      - name: Test exact tagged source
+        run: npm test
+      - name: Validate complete consumer pack inventory
+        run: |
+          npm pack --dry-run --json > "$RUNNER_TEMP/pack.json"
+          PACK_JSON="$RUNNER_TEMP/pack.json" node --input-type=module <<'NODE'
+          import assert from 'node:assert/strict';
+          import { readFileSync } from 'node:fs';
+          const [pack] = JSON.parse(readFileSync(process.env.PACK_JSON, 'utf8'));
+          const manifest = JSON.parse(readFileSync('package.json', 'utf8'));
+          assert.equal(pack.name, manifest.name);
+          assert.equal(pack.version, manifest.version);
+          assert.deepEqual(pack.files.map(file => file.path).sort(), [
+            'LICENSE', 'NOTICE.md', 'README.md', 'package.json',
+            'themes/solarized-dark.json', 'themes/solarized-light.json',
+          ].sort());
+          for (const file of pack.files) console.log(`${file.path}: ${file.size} bytes`);
+          NODE
+          git diff --exit-code
+          test -z "$(git status --porcelain)"
+      - name: Reconcile registry before publication
+        id: registry
+        env:
+          NAME: ${{ steps.identity.outputs.name }}
+          VERSION: ${{ steps.identity.outputs.version }}
+          COMMIT: ${{ steps.identity.outputs.commit }}
+        run: node scripts/release-identity.mjs pre "$NAME" "$VERSION" "$COMMIT"
+      - name: Publish missing version via trusted publishing
+        if: steps.registry.outputs.publish == 'true'
+        run: npm publish --access public
+      - name: Verify published version and gitHead
+        if: always() && steps.registry.outcome == 'success'
+        env:
+          NAME: ${{ steps.identity.outputs.name }}
+          VERSION: ${{ steps.identity.outputs.version }}
+          COMMIT: ${{ steps.identity.outputs.commit }}
+        run: node scripts/release-identity.mjs post "$NAME" "$VERSION" "$COMMIT"
