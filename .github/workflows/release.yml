@@ -1,6 +1,8 @@
 name: Publish to npm
 
 on:
+  release:
+    types: [published]
   workflow_dispatch:
     inputs:
       tag:
@@ -18,12 +20,15 @@ concurrency:
 
 jobs:
   publish:
+    if: github.event_name == 'workflow_dispatch' || !github.event.release.prerelease
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    env:
+      RELEASE_TAG: ${{ github.event.release.tag_name || inputs.tag }}
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ inputs.tag }}
+          ref: refs/tags/${{ env.RELEASE_TAG }}
           fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
@@ -50,8 +55,6 @@ jobs:
           NODE
       - name: Bind immutable release identity
         id: identity
-        env:
-          RELEASE_TAG: ${{ inputs.tag }}
         run: |
           set -euo pipefail
           version="$(node -p 'JSON.parse(require("fs").readFileSync("package.json", "utf8")).version')"

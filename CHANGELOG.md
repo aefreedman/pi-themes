@@ -8,6 +8,7 @@
 
 - Declare explicit dark/light appearance for the Solarized themes, preserving both palettes.
 - Bind release publication and retries to the immutable tag, version, and source commit, with pre-publication validation and post-publication identity checks.
+- Automatically publish stable GitHub releases through trusted npm publishing while retaining immutable-tag manual recovery.
 
 ## 0.2.1 - 2026-08-29
 
