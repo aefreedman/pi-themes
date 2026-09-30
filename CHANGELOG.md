@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Fixed
+
+- Keep release success tied to source validation and `npm publish`, not the registry's eventual post-publish visibility; retain the fail-closed pre-publish identity check.
+
 ## 0.2.2 - 2026-09-29
 
 ### Changed

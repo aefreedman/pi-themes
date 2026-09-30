@@ -16,7 +16,7 @@ test("stable release and manual recovery share an explicit immutable tag checkou
   assert.match(workflow, /\[\[ "\$remote_commit" == "\$commit" \]\]/);
 });
 
-test("trusted publishing identity and validation gates remain unchanged", () => {
+test("trusted publishing keeps preflight identity and does not gate success on registry propagation", () => {
   assert.match(workflow, /id-token: write/);
   assert.match(workflow, /runs-on: ubuntu-latest/);
   assert.match(workflow, /node-version: 24/);
@@ -24,6 +24,7 @@ test("trusted publishing identity and validation gates remain unchanged", () => 
   assert.match(workflow, /run: npm test/);
   assert.match(workflow, /npm pack --dry-run --json/);
   assert.match(workflow, /node scripts\/release-identity\.mjs pre/);
-  assert.match(workflow, /node scripts\/release-identity\.mjs post/);
+  assert.match(workflow, /run: npm publish --access public/);
+  assert.doesNotMatch(workflow, /node scripts\/release-identity\.mjs post/);
   assert.doesNotMatch(workflow, /NODE_AUTH_TOKEN|NPM_TOKEN|secrets\.|environment:/);
 });

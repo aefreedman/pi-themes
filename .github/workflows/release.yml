@@ -108,10 +108,3 @@ jobs:
       - name: Publish missing version via trusted publishing
         if: steps.registry.outputs.publish == 'true'
         run: npm publish --access public
-      - name: Verify published version and gitHead
-        if: always() && steps.registry.outcome == 'success'
-        env:
-          NAME: ${{ steps.identity.outputs.name }}
-          VERSION: ${{ steps.identity.outputs.version }}
-          COMMIT: ${{ steps.identity.outputs.commit }}
-        run: node scripts/release-identity.mjs post "$NAME" "$VERSION" "$COMMIT"
