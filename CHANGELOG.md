@@ -2,8 +2,11 @@
 
 ## Unreleased
 
+## 0.2.3 - 2026-10-13
+
 ### Fixed
 
+- Use the canonical Pi theme schema URL and validate themes offline with the pinned Pi runtime, including strict-contract regression coverage; preserve both palettes.
 - Keep release success tied to source validation and `npm publish`, not the registry's eventual post-publish visibility; retain the fail-closed pre-publish identity check.
 
 ## 0.2.2 - 2026-09-29

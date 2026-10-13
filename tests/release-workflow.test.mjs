@@ -21,6 +21,8 @@ test("trusted publishing keeps preflight identity and does not gate success on r
   assert.match(workflow, /runs-on: ubuntu-latest/);
   assert.match(workflow, /node-version: 24/);
   assert.match(workflow, /npm install --global npm@\^11\.5\.1/);
+  assert.match(workflow, /run: npm ci --ignore-scripts/);
+  assert.ok(workflow.indexOf("run: npm ci --ignore-scripts") < workflow.indexOf("run: npm test"), "install locked validation dependencies before tests");
   assert.match(workflow, /run: npm test/);
   assert.match(workflow, /npm pack --dry-run --json/);
   assert.match(workflow, /node scripts\/release-identity\.mjs pre/);

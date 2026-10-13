@@ -1,6 +1,6 @@
 {
   "name": "@aefree/pi-themes",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "license": "MIT",
   "type": "module",
   "keywords": [
@@ -31,5 +31,8 @@
   "bugs": {
     "url": "https://github.com/aefreedman/pi-themes/issues"
   },
-  "homepage": "https://github.com/aefreedman/pi-themes#readme"
+  "homepage": "https://github.com/aefreedman/pi-themes#readme",
+  "devDependencies": {
+    "@earendil-works/pi-coding-agent": "1.2.0"
+  }
 }

@@ -49,6 +49,12 @@ To follow the terminal's detected appearance, start Pi with the paired themes:
 pi --use-theme solarized-light/solarized-dark
 ```
 
+## Development
+
+Run `npm ci` and `npm test`. Theme contract tests use the exact development Pi version selected in `package.json` and fail if the package-local installed version differs. Validation is offline and uses Pi's shipped strict JSON validator; palette checks remain separate from schema validation.
+
+`npm pack --dry-run` verifies that only consumer themes, package metadata, and license/attribution documentation ship, not the development runtime or tests.
+
 ## Attribution
 
 The `solarized-dark` and `solarized-light` themes adapt the Solarized color palette created by Ethan Schoonover. See `NOTICE.md`.

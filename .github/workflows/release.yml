@@ -78,6 +78,8 @@ jobs:
           echo "version=$version" >> "$GITHUB_OUTPUT"
           echo "name=$name" >> "$GITHUB_OUTPUT"
           echo "commit=$commit" >> "$GITHUB_OUTPUT"
+      - name: Install locked development dependencies
+        run: npm ci --ignore-scripts
       - name: Test exact tagged source
         run: npm test
       - name: Validate complete consumer pack inventory
