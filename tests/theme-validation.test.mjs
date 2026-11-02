@@ -1,5 +1,9 @@
 import assert from "node:assert/strict";
-import { readFile } from "node:fs/promises";
+import { copyFile, mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { execSync } from "node:child_process";
+import { tmpdir } from "node:os";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 import test from "node:test";
 
 // Resolve only the package-local install: never fall back to a parent/global SDK.
@@ -12,6 +16,13 @@ assert.equal(installed.version, expectedVersion, "Installed Pi must match the ma
 // Pi does not export this isolated validator through its SDK entrypoint. Import its
 // shipped implementation directly; dependency updates must verify this seam.
 const { validateThemeJson } = await import(new URL("dist/modes/interactive/theme/theme-schema.js", runtimeRoot));
+const { DefaultResourceLoader } = await import(new URL("dist/core/resource-loader.js", runtimeRoot));
+const { SettingsManager } = await import(new URL("dist/core/settings-manager.js", runtimeRoot));
+const { setThemeJsonValidator, getResolvedThemeColors, setRegisteredThemes } = await import(
+  new URL("dist/modes/interactive/theme/theme.js", runtimeRoot)
+);
+// Install the validator exactly as Pi's startup does before resource loading.
+setThemeJsonValidator(validateThemeJson);
 
 function isColorValue(value, variables) {
   return value === ""
@@ -64,6 +75,72 @@ for (const [label, mutate, errorPattern] of invalidCases) {
     assert.throws(() => validateThemeJson(label, theme), errorPattern);
   });
 }
+
+test("packed themes load through Pi's startup resource loader and reload", async () => {
+  const root = fileURLToPath(new URL("../", import.meta.url));
+  // No pack lifecycle hooks are declared; use the actual npm inclusion inventory.
+  const [packed] = JSON.parse(execSync("npm pack --dry-run --json", { cwd: root, encoding: "utf8" }));
+  const paths = packed.files.map(file => file.path);
+  assert.deepEqual(paths.filter(path => path.startsWith("themes/")).sort(), [
+    "themes/solarized-dark.json", "themes/solarized-light.json",
+  ]);
+  assert.ok(!paths.some(path => /^(node_modules|tests|scripts)\//.test(path)));
+  const temp = await mkdtemp(join(tmpdir(), "pi-themes-host-"));
+  try {
+    const packageRoot = join(temp, "package");
+    for (const path of paths) {
+      const destination = join(packageRoot, path);
+      await mkdir(dirname(destination), { recursive: true });
+      await copyFile(join(root, path), destination);
+    }
+    const cwd = join(temp, "project");
+    const agentDir = join(temp, "agent");
+    await mkdir(cwd);
+    await mkdir(agentDir);
+    const loader = new DefaultResourceLoader({
+      cwd, agentDir,
+      settingsManager: SettingsManager.inMemory({ packages: [packageRoot] }),
+      noExtensions: true, noSkills: true, noPromptTemplates: true, noContextFiles: true,
+    });
+    await loader.reload();
+    const { themes, diagnostics } = loader.getThemes();
+    assert.deepEqual(diagnostics, []);
+    assert.deepEqual(themes.map(theme => theme.name).sort(), ["solarized-dark", "solarized-light"]);
+    setRegisteredThemes(themes);
+    for (const theme of themes) {
+      const source = JSON.parse(await readFile(theme.sourcePath, "utf8"));
+      assert.equal(theme.appearance, source.appearance);
+      const colors = getResolvedThemeColors(theme.name);
+      for (const [token, value] of Object.entries(source.colors)) {
+        assert.equal(colors[token], source.vars[value] ?? value, `${theme.name}: ${token}`);
+      }
+    }
+    // Schema errors and unresolved/cyclic vars must become startup diagnostics,
+    // not partially loaded themes. A subsequent reload must recover.
+    const themePath = join(packageRoot, "themes/solarized-dark.json");
+    const source = await readFile(themePath, "utf8");
+    for (const mutate of [
+      theme => { theme.metadata = "unsupported"; },
+      theme => { theme.colors.accent = "missing-variable"; },
+      theme => { theme.vars.cyan = "cyan"; },
+    ]) {
+      const invalid = JSON.parse(source);
+      mutate(invalid);
+      await writeFile(themePath, JSON.stringify(invalid));
+      await loader.reload();
+      assert.deepEqual(loader.getThemes().themes.map(theme => theme.name), ["solarized-light"]);
+      assert.equal(loader.getThemes().diagnostics.length, 1);
+      assert.equal(loader.getThemes().diagnostics[0].path, themePath);
+    }
+    await writeFile(themePath, source);
+    await loader.reload();
+    assert.equal(loader.getThemes().themes.length, 2);
+    assert.deepEqual(loader.getThemes().diagnostics, []);
+  } finally {
+    setRegisteredThemes([]);
+    await rm(temp, { recursive: true, force: true });
+  }
+});
 
 test("Pi validator permits optional tokens to be omitted", () => {
   const theme = structuredClone(validTheme);
