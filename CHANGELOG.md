@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.2.4 - 2026-11-02
+
 ### Changed
 
 - Validate against Pi 1.5.0, including packaged theme discovery, startup loading, palette resolution, and invalid-theme reload recovery.
